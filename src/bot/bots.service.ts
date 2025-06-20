@@ -1,12 +1,18 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
+import { Update, Ctx, Start, Help, On, Hears, Action } from 'nestjs-telegraf';
+import { Context, Markup } from 'telegraf';
 import axios from 'axios';
 import * as cron from 'node-cron';
-import { Telegraf, Markup } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import * as fs from 'fs';
+import { User } from 'telegraf/typings/core/types/typegram';
+import { UsersService } from '../users/users.service';
 
-@Injectable()
+@Update()
 export class BotsService implements OnModuleInit {
-  private readonly bot = new Telegraf('7273242765:AAHLxiSvfZd3XHimjtYam7Zgn70qYzc81hk');
+  private readonly bot = new Telegraf(
+    '7273242765:AAHLxiSvfZd3XHimjtYam7Zgn70qYzc81hk',
+  );
   private readonly chatId = '7273242765'; // kanal yoki admin chat ID
 
   async onModuleInit() {
@@ -28,18 +34,21 @@ export class BotsService implements OnModuleInit {
     });
 
     // Callback handler (button bosilganda)
-    /*this.bot.action('next', async (ctx) => {
-      await this.sendSurah(ctx.chat.id);
+    this.bot.action('next', async (ctx) => {
+      await this.sendSurah((ctx as any).chat.id);
       await ctx.answerCbQuery();
-    });*/
+    });
 
     this.bot.action('current', async (ctx) => {
       const currentSurah = this.getCurrentSurah();
       const response = await axios.get(
-        `https://api.quranenc.com/v1/translation/sura/uzbek_mansour/${currentSurah}`
+        `https://api.quranenc.com/v1/translation/sura/uzbek_mansour/${currentSurah}`,
       );
       const surahData = response.data;
-      await ctx.reply(`📖 Hozirgi sura: *${surahData.sura_name}* (${currentSurah})`, { parse_mode: 'Markdown' });
+      await ctx.reply(
+        `📖 Hozirgi sura: *${surahData.sura_name}* (${currentSurah})`,
+        { parse_mode: 'Markdown' },
+      );
       await ctx.answerCbQuery();
     });
 
@@ -62,7 +71,7 @@ export class BotsService implements OnModuleInit {
 
     try {
       const response = await axios.get(
-        `https://api.quranenc.com/v1/translation/sura/uzbek_mansour/${currentSurah}`
+        `https://api.quranenc.com/v1/translation/sura/uzbek_mansour/${currentSurah}`,
       );
       const surahData = response.data;
 
@@ -75,13 +84,18 @@ export class BotsService implements OnModuleInit {
       const chunks = this.splitMessage(message, 4000);
 
       for (const chunk of chunks) {
-        await this.bot.telegram.sendMessage(chatId, chunk, { parse_mode: 'Markdown' });
+        await this.bot.telegram.sendMessage(chatId, chunk, {
+          parse_mode: 'Markdown',
+        });
       }
 
       this.incrementSurah();
     } catch (err) {
       console.error('Xatolik yuz berdi: ', err.message);
-      await this.bot.telegram.sendMessage(chatId, '❌ Kechirasiz, sura olishda muammo yuz berdi.');
+      await this.bot.telegram.sendMessage(
+        chatId,
+        '❌ Kechirasiz, sura olishda muammo yuz berdi.',
+      );
     }
   }
 
@@ -111,5 +125,101 @@ export class BotsService implements OnModuleInit {
       text = text.substring(limit);
     }
     return parts;
+  }
+}
+
+@Update()
+export class BotUpdate {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Start()
+  async onStartCommand(@Ctx() ctx: Context) {
+    const buttons = Markup.inlineKeyboard([
+      [Markup.button.callback('📖 Darsni boshlash', 'begin_lesson')],
+      //[Markup.button.callback('📖 Keyingi sura', 'next')],
+      //[Markup.button.callback('🔍 Hozirgi sura', 'current')],
+      //[Markup.button.callback('♻️ Reset', 'reset')],
+    ]);
+
+    const {
+      id: telegramId,
+      is_bot: isBot,
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+    } = ctx.from as User;
+
+    await this.usersService.findOrCreateUser({
+      telegramId: telegramId.toString(),
+      isBot,
+      firstName,
+      lastName,
+      username,
+    });
+
+    //await ctx.reply('Quyidagi menyudan tanlang:', buttons);
+    await ctx.reply('Darsni boshlash tugmasini bosing:', buttons);
+
+    /*await ctx.reply('Asosiy menyu:', {
+      reply_markup: {
+        keyboard: [
+          [{ text: '📖 Darsni boshlash' }],
+          [{ text: '🕋 Tasbeh' }, { text: '📚 Ma’lumotlar' }],
+          [{ text: '⚙️ Sozlamalar' }],
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: false,
+      },
+    });*/
+  }
+
+  @Action('begin_lesson')
+  async onBeginLessonCommand(@Ctx() ctx: Context) {
+    const {
+      id: telegramId,
+      is_bot: isBot,
+      first_name: firstName,
+      last_name: lastName,
+      username: username,
+    } = ctx.from as User;
+
+    const user = await this.usersService.getUserByTelegramId(telegramId.toString())
+    await ctx.reply(`${user?.createdAt}`);
+    /*if (user) {
+      
+    }*/
+
+    /*await ctx.answerCbQuery();
+    await ctx.reply(
+      `📚 Siz Qur’on darslariga muvaffaqiyatli a'zo bo‘ldingiz!
+
+        🌙 Endi har kuni soat 19:00 da sizga bitta sura yuboriladi. Bu sura:
+        - Arab tilida matn bilan
+        - O‘zbekcha tarjima yoki tafsir
+
+        📖 Ilm olish yo‘lida harakat qilgan bandaga Alloh yengillik beradi. Siz ham bu yo‘ldasiz!
+
+        🕋 Qur’on bilan qalbingizni tozalang, hayotingizni yoriting!`,
+    );*/
+  }
+
+  @Help()
+  async helpCommand(@Ctx() ctx: Context) {
+    await ctx.reply('Send me a message, and I will echo it back!');
+  }
+
+  @On('text')
+  async onTextMessage(@Ctx() ctx: Context) {
+    await ctx.reply(`You said: ${(ctx as any).message['text']}`);
+  }
+
+  @Hears('hello')
+  async onHello(@Ctx() ctx: Context) {
+    await ctx.reply('Hi there!');
+  }
+
+  @On('sticker')
+  async onSticker(@Ctx() ctx: Context) {
+    await ctx.reply('👍');
   }
 }
