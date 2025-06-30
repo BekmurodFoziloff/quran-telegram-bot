@@ -1,9 +1,23 @@
+import { IsString, IsBoolean, IsOptional } from 'class-validator';
+
 export class CreateUserDto {
-    id: number
-    telegramId: number;
-    firstName: string;
-    username: string;
-    createdAt: Date;
+  @IsString()
+  telegramId: string;
+
+  @IsBoolean()
+  isBot: boolean;
+
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  lastName?: string;
+
+  @IsOptional()
+  @IsString()
+  username?: string;
 }
 
 export default CreateUserDto;

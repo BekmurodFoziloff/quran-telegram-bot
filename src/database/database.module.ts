@@ -16,9 +16,10 @@ import { join } from 'path';
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [join(__dirname + '/../**/*.entity{.ts,.js}')],
-        synchronize: true
-      })
-    })
-  ]
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+    }),
+  ],
 })
 export class DatabaseModule {}

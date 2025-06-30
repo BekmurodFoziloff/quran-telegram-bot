@@ -1,25 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import User from './user.entity';
+import Users from './users.entity';
 import CreateUserDto from './dto/user.dto';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
   ) {}
 
-  async findOrCreate(userData: CreateUserDto) {
-    let user = await this.userRepository.findOne({
+  async findOrCreateUser(userData: CreateUserDto) {
+    let user = await this.usersRepository.findOne({
       where: { telegramId: userData.telegramId },
     });
 
     if (!user) {
-      user = this.userRepository.create(userData);
-      await this.userRepository.save(user);
+      user = this.usersRepository.create(userData);
+      await this.usersRepository.save(user);
     }
+
+    return user;
+  }
+
+  async getUserByTelegramId(telegramId: string) {
+    const user = await this.usersRepository.findOne({
+      where: { telegramId },
+    });
 
     return user;
   }
