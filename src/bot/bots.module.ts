@@ -6,9 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
 import { LessonsModule } from '../lessons/lessons.module';
 import { UserProgressesModule } from '../userProgresses/userProgresses.module';
+import { AppI18nModule } from '../i18n/i18n.module';
 
 @Module({
   imports: [
+    AppI18nModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TelegrafModule.forRootAsync({
       imports: [ConfigModule],

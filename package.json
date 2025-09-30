@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start": "NODE_ENV=production node dist/main.js",
+    "start:dev": "NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -34,6 +34,7 @@
     "class-validator": "^0.14.2",
     "ioredis": "^5.7.0",
     "joi": "^17.13.3",
+    "nestjs-i18n": "^10.5.1",
     "nestjs-telegraf": "^2.9.1",
     "pg": "^8.14.1",
     "reflect-metadata": "^0.2.2",

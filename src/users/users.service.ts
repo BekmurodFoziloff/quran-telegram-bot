@@ -13,13 +13,10 @@ export class UsersService {
 
   async createUser(userData: CreateUserDto) {
     let user = await this.getUserByTelegramId(userData.telegramId);
-
     if (!user) {
       user = this.usersRepository.create(userData);
       await this.usersRepository.save(user);
     }
-
-    return user;
   }
 
   async getUserByTelegramId(telegramId: string) {
@@ -34,5 +31,15 @@ export class UsersService {
     });
 
     return users.map((user) => user.telegramId);
+  }
+
+  async updateUserLang(telegramId: string, userLang: string) {
+    const user = await this.getUserByTelegramId(telegramId);
+    if (!user) return;
+
+    await this.usersRepository.update({ id: user.id }, { language: userLang });
+
+    const updatedUser = await this.getUserByTelegramId(telegramId);
+    if (updatedUser) return updatedUser;
   }
 }

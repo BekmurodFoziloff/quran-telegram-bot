@@ -25,19 +25,17 @@ export class LessonsService {
     });
   }
 
-  async createLesson(telegramId: string): Promise<Lesson | null> {
+  async createLesson(telegramId: string): Promise<void> {
     const user = await this.usersService.getUserByTelegramId(telegramId);
-    if (!user) return null;
+    if (!user) return;
 
     const lastLesson = await this.getLastLesson(telegramId);
 
     if (!lastLesson || lastLesson.status !== LessonStatus.ACTIVE) {
       const lessonNumber = lastLesson ? lastLesson.lessonNumber + 1 : 1;
       const newLesson = this.lessonsRepository.create({ user, lessonNumber });
-      return this.lessonsRepository.save(newLesson);
+      await this.lessonsRepository.save(newLesson);
     }
-
-    return lastLesson;
   }
 
   async completeLesson(telegramId: string): Promise<void> {
@@ -74,14 +72,11 @@ export class LessonsService {
     });
   }
 
-  async saveDraft(
-    telegramId: string,
-    translator: string,
-  ): Promise<LessonDraft | null> {
+  async saveDraft(telegramId: string, translator: string): Promise<void> {
     const user = await this.usersService.getUserByTelegramId(telegramId);
-    if (!user) return null;
+    if (!user) return;
 
-    return this.lessonDraftsRepository.save({ user, translator });
+    await this.lessonDraftsRepository.save({ user, translator });
   }
 
   async confirmDraft(telegramId: string): Promise<Lesson | null> {
@@ -113,23 +108,23 @@ export class LessonsService {
     return lesson;
   }
 
-  async cancelDraft(telegramId: string): Promise<LessonDraft | undefined> {
+  async cancelDraft(telegramId: string): Promise<LessonDraft | null> {
     const user = await this.usersService.getUserByTelegramId(telegramId);
-    if (!user) return;
+    if (!user) return null;
 
     const draft = await this.lessonDraftsRepository.findOne({
       where: { user: { id: user.id } },
     });
-    if (!draft) return;
+    if (!draft) return null;
 
     await this.lessonDraftsRepository.delete({ user: { id: user.id } });
 
     return draft;
   }
 
-  async cancelLesson(telegramId: string): Promise<Lesson | undefined> {
+  async cancelLesson(telegramId: string): Promise<Lesson | null> {
     const lastLesson = await this.getLastLesson(telegramId);
-    if (!(lastLesson && lastLesson.status === LessonStatus.ACTIVE)) return;
+    if (!(lastLesson && lastLesson.status === LessonStatus.ACTIVE)) return null;
 
     await this.lessonsRepository.update(
       { id: lastLesson.id },
@@ -137,7 +132,7 @@ export class LessonsService {
     );
 
     const lesson = await this.getLesson(telegramId);
-    if (!lesson) return;
+    if (!lesson) return null;
 
     return lesson;
   }

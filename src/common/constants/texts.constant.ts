@@ -26,7 +26,7 @@ export const TEXTS = {
     LANGUAGES: {
       UZBEK: 'lang_uz',
       RUSSIAN: 'lang_ru',
-      ENGLISH: 'lang_eng',
+      ENGLISH: 'lang_en',
     },
   },
 

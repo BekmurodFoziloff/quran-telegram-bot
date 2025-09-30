@@ -4,6 +4,8 @@ import { Cron } from '@nestjs/schedule';
 import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { User, Message } from 'telegraf/types';
+import { I18nService } from 'nestjs-i18n';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LessonsService } from '../lessons/lessons.service';
 import { UserProgressesService } from '../userProgresses/userProgresses.service';
@@ -15,6 +17,8 @@ import { TEXTS } from '../common/constants/texts.constant';
 export class BotsService {
   constructor(
     @InjectBot() private readonly bot: Telegraf,
+    private readonly i18n: I18nService,
+    private configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly lessonsService: LessonsService,
     private readonly userProgressesService: UserProgressesService,
@@ -27,8 +31,10 @@ export class BotsService {
       is_bot: isBot,
       first_name: firstName,
       last_name: lastName,
-      username: username,
+      username,
     } = ctx.from as User;
+
+    const userLang = this.configService.get<string>('DEFAULT_LANGUAGE') || 'uz';
 
     await this.usersService.createUser({
       telegramId: telegramId.toString(),
@@ -36,6 +42,7 @@ export class BotsService {
       firstName,
       lastName,
       username,
+      language: userLang,
     });
 
     const replyMenu = Markup.keyboard([
@@ -273,6 +280,41 @@ export class BotsService {
     }
 
     await ctx.replyWithHTML(replyText);
+  }
+
+  @Action(['lang_uz', 'lang_ru', 'lang_en'])
+  async setLanguage(@Ctx() ctx: Context) {
+    await ctx.answerCbQuery();
+
+    const { id: telegramId } = ctx.from as User;
+    const telegramIdStr = telegramId.toString();
+    let action: string | undefined;
+
+    if (ctx.message && 'text' in ctx.message) {
+      action = ctx.message.text.split(' ')[0];
+    } else if (ctx.callbackQuery && 'data' in ctx.callbackQuery) {
+      action = ctx.callbackQuery.data.split(' ')[0];
+    }
+
+    if (!action) return;
+
+    const langCode = action.replace('lang_', '');
+
+    await this.usersService.updateUserLang(telegramIdStr, langCode);
+
+    /*const messages = {
+      [TEXTS.ACTIONS.LANGUAGES.UZBEK]: 'Til o‘rnatildi: 🇺🇿 O‘zbekcha',
+      [TEXTS.ACTIONS.LANGUAGES.RUSSIAN]: 'Язык установлен: 🇷🇺 Русский',
+      [TEXTS.ACTIONS.LANGUAGES.ENGLISH]: 'Language set: 🇬🇧 English',
+    };
+
+    await ctx.answerCbQuery(messages[action]);*/
+
+    const message = await this.i18n.translate('messages.start', {
+      lang: langCode,
+    });
+
+    await ctx.reply(message);
   }
 
   @Action(TEXTS.ACTIONS.PREV)
@@ -624,7 +666,10 @@ export class BotsService {
           undefined,
           undefined,
         );*/
-        await this.bot.telegram.deleteMessage(telegramId, buttonAction.messageId);
+        await this.bot.telegram.deleteMessage(
+          telegramId,
+          buttonAction.messageId,
+        );
       }
     } catch (err) {
       if (err.response && err.response.statusCode === 400) {
@@ -873,7 +918,10 @@ export class BotsService {
               undefined,
               undefined,
             );*/
-            await this.bot.telegram.deleteMessage(telegramId, buttonAction.messageId);
+            await this.bot.telegram.deleteMessage(
+              telegramId,
+              buttonAction.messageId,
+            );
           }
         } catch (err) {
           if (err.response && err.response.statusCode === 400) {
@@ -881,8 +929,10 @@ export class BotsService {
           }
         }
 
-        const current =
-          await this.userProgressesService.getUserPosition(telegramIdStr, TEXTS.ACTIONS.CURRENT);
+        const current = await this.userProgressesService.getUserPosition(
+          telegramIdStr,
+          TEXTS.ACTIONS.CURRENT,
+        );
         if (!current) {
           await this.bot.telegram.sendMessage(
             telegramId,

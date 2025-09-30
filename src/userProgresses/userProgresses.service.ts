@@ -81,13 +81,13 @@ export class UserProgressesService {
     telegramId: string,
     surah: number,
     ayah: number,
-  ): Promise<UserProgress | null> {
+  ): Promise<void> {
     const user = await this.usersService.getUserByTelegramId(telegramId);
-    if (!user) return null;
+    if (!user) return;
 
     const lastLesson = await this.lessonsService.getLastLesson(telegramId);
     if (!lastLesson || lastLesson.status !== LessonStatus.ACTIVE) {
-      return null;
+      return;
     }
 
     const userPosition = this.userProgressesRepository.create({
@@ -97,7 +97,7 @@ export class UserProgressesService {
       ayahNumber: ayah,
     });
 
-    return await this.userProgressesRepository.save(userPosition);
+    await this.userProgressesRepository.save(userPosition);
   }
 
   async fetchAyah(surah: number, ayah: number) {
