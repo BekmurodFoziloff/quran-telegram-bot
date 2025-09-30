@@ -18,6 +18,10 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   username?: string;
+
+  @IsOptional()
+  @IsString()
+  language?: string;
 }
 
 export default CreateUserDto;

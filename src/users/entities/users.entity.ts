@@ -30,6 +30,9 @@ class User {
   @Column({ nullable: true })
   public username?: string;
 
+  @Column({ nullable: true })
+  public language?: string;
+
   @OneToMany(() => Lesson, (lesson) => lesson.user)
   @JoinColumn()
   public lessons: Lesson[];

@@ -1,0 +1,79 @@
+{
+  "COMMANDS": {
+    "START_LESSON": "📖 Start Lesson",
+    "SEARCH_AYAH": "🔍 Search Ayah",
+    "ABOUT": "ℹ️ About the Bot",
+    "STATS": "📊 Statistics",
+    "CHANGE_LANGUAGE": "🇺🇿/🇷🇺 Change Language"
+  },
+  "ACTIONS": {
+    "TRANSLATOR": {
+      "UZBEK": "translator:uz",
+      "RUSSIAN": "translator:ru",
+      "ENGLISH": "translator:en",
+      "TURKISH": "translator:tr"
+    },
+    "CONFIRM_DRAFT": "confirm_draft",
+    "CANCEL_DRAFT": "cancel_draft",
+    "CONTINUE_LESSON": "continue_lesson",
+    "CANCEL_LESSON": "cancel_lesson",
+    "PREV": "prev",
+    "CURRENT": "current",
+    "NEXT": "next",
+    "LANGUAGES": {
+      "UZBEK": "lang_uz",
+      "RUSSIAN": "lang_ru",
+      "ENGLISH": "lang_en"
+    }
+  },
+  "MESSAGES": {
+    "START": "🕌 <b>As-salamu alaykum, dear user!</b>\n\nYou are connected to the greatest blessing — <b>the Holy Qur’an</b>.\nEach verse is light for the heart, guidance for life, and peace for the soul.\n\nNow you can read the Qur’an every day little by little — <i>with Arabic text, transliteration, and translation</i>.\n\n➡️ To begin, press the button «<b>📖 Start Lesson</b>».\n\n📿 <i>May Allah accept your intention and increase your rewards!</i>",
+    "ABOUT": "<b>🟢 About the Bot</b>\n\nThis bot keeps you connected with the Qur’an.\n\nEvery day at <b>19:00</b>, you will receive <b>one verse</b> — <i>with Arabic text, transliteration, and well-known translations</i>.\n\n<b>📖 Reading starts from the beginning of the Qur’an</b>, and through each lesson you will:\n– Learn to <b>read correctly</b>,\n– <b>Understand the meaning</b>,\n– <b>Reflect through different translations</b>.\n\nThis is a spiritual journey awakening your heart with the Qur’an.\n<b>Every letter is a reward, every day is a blessing!</b>",
+    "SEARCH_AYAH": "<b>📖 Ayah Search Guide</b>\n\nTo search for a verse, type in the following format:\n<code>Surah:Ayah</code>\n\n✅ <b>Examples:</b>\n- <code>1:1</code> — Surah 1, Ayah 1\n- <code>2:255</code> — Surah 2, Ayah 255\n\n⚠️ <b>Note:</b>\n- Surah number must be between <code>1</code> and <code>114</code>\n- Ayah number must not exceed the maximum in that surah\n- Only the <code>:</code> symbol is allowed between numbers",
+    "SELECT_TRANSLATOR": "Choose a translator:",
+    "ACTIVE_LESSON_EXISTS": "You already have an active lesson. What would you like to do?",
+    "SELECT_LANGUAGE": "Choose a language:",
+    "SURAH_END": "📘 You have reached the end of this Surah.",
+    "QURAN_COMPLETE": "✅ Qur’an reading is complete. Congratulations!",
+    "WELCOME_BACK": "Welcome back to the Qur’an lesson!",
+    "FIRST_VERSE": "📖 This is the first verse of the Qur’an. You cannot go back further.",
+    "SURAH_START": "📖 A new Surah has started from the beginning."
+  },
+  "VALIDATION": {
+    "INVALID_SURAH": "📖 Surah number must be between 1 and 114.",
+    "INVALID_AYAH": "📖 Ayah number must start from 1.",
+    "INVALID_RANGE": "❌ Please enter a number within the range of ayahs in this Surah.",
+    "LOAD_ERROR": "❌ Failed to load ayah. Please try again later.",
+    "NO_LESSON": "❗ You haven’t started any lessons yet.",
+    "CONFIRM_ERROR": "🚫 No lesson found to confirm.",
+    "CANCEL_ERROR": "🚫 No lesson found to cancel.",
+    "NOT_STARTED": "❗ You haven’t started reading the Qur’an yet.",
+    "SYSTEM_ERROR": "⚠️ An error occurred. Please try again later."
+  },
+  "BUTTONS": {
+    "CONFIRM_DRAFT": "✅ Confirm Lesson",
+    "CANCEL_DRAFT": "❌ Cancel Lesson",
+    "CONTINUE_LESSON": "▶️ Continue",
+    "CANCEL_LESSON": "❌ Cancel Lesson",
+    "PREV": "⬅️ Previous",
+    "CURRENT": "📖 Current",
+    "NEXT": "➡️ Next",
+    "TRANSLATORS": {
+      "UZBEK": "🇺🇿 Uzbek (Mansour)",
+      "RUSSIAN": "🇷🇺 Russian (Kuliev)",
+      "ENGLISH": "🇬🇧 English (Sahih)",
+      "TURKISH": "🇹🇷 Turkish (Diyanet)"
+    },
+    "LANGUAGES": {
+      "UZBEK": "🇺🇿 Uzbek",
+      "RUSSIAN": "🇷🇺 Russian",
+      "ENGLISH": "🇬🇧 English"
+    }
+  },
+  "TRANSLATOR_LABELS": {
+    "uz": "🇺🇿 Uzbek (Mansour)",
+    "ru": "🇷🇺 Russian (Kuliev)",
+    "en": "🇬🇧 English (Sahih)",
+    "tr": "🇹🇷 Turkish (Diyanet)"
+  }
+}

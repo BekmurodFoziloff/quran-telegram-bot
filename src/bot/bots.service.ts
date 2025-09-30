@@ -4,6 +4,8 @@ import { Cron } from '@nestjs/schedule';
 import { InjectBot } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { User, Message } from 'telegraf/types';
+import { I18nService } from 'nestjs-i18n';
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LessonsService } from '../lessons/lessons.service';
 import { UserProgressesService } from '../userProgresses/userProgresses.service';
@@ -15,6 +17,8 @@ import { TEXTS } from '../common/constants/texts.constant';
 export class BotsService {
   constructor(
     @InjectBot() private readonly bot: Telegraf,
+    private readonly i18n: I18nService,
+    private configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly lessonsService: LessonsService,
     private readonly userProgressesService: UserProgressesService,
@@ -30,12 +34,15 @@ export class BotsService {
       username: username,
     } = ctx.from as User;
 
+    const userLang = this.configService.get<string>('DEFAULT_LANGUAGE') || 'uz';
+
     await this.usersService.createUser({
       telegramId: telegramId.toString(),
       isBot,
       firstName,
       lastName,
       username,
+      language: userLang
     });
 
     const replyMenu = Markup.keyboard([
@@ -624,7 +631,10 @@ export class BotsService {
           undefined,
           undefined,
         );*/
-        await this.bot.telegram.deleteMessage(telegramId, buttonAction.messageId);
+        await this.bot.telegram.deleteMessage(
+          telegramId,
+          buttonAction.messageId,
+        );
       }
     } catch (err) {
       if (err.response && err.response.statusCode === 400) {
@@ -873,7 +883,10 @@ export class BotsService {
               undefined,
               undefined,
             );*/
-            await this.bot.telegram.deleteMessage(telegramId, buttonAction.messageId);
+            await this.bot.telegram.deleteMessage(
+              telegramId,
+              buttonAction.messageId,
+            );
           }
         } catch (err) {
           if (err.response && err.response.statusCode === 400) {
@@ -881,8 +894,10 @@ export class BotsService {
           }
         }
 
-        const current =
-          await this.userProgressesService.getUserPosition(telegramIdStr, TEXTS.ACTIONS.CURRENT);
+        const current = await this.userProgressesService.getUserPosition(
+          telegramIdStr,
+          TEXTS.ACTIONS.CURRENT,
+        );
         if (!current) {
           await this.bot.telegram.sendMessage(
             telegramId,
